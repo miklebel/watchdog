@@ -1,0 +1,41 @@
+version: "3.1"
+
+services:
+  watchdog-postgresql:
+    container_name: watchdog-postgresql
+    image: postgres:12.2
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: "watchdog"
+      POSTGRES_PASSWORD: "watchdog"
+      POSTGRES_DB: "watchdog"
+    volumes:
+      - ./postgresql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./data/postgresql:/var/lib/postgresql/data
+
+  watchdog-clickhouse:
+    container_name: watchdog-clickhouse
+    image: yandex/clickhouse-server:21
+    restart: always
+    ports:
+      - 8123:8123
+      - 9000:9000
+    volumes:
+      - ./clickhouse/config.xml:/etc/clickhouse-server/config.xml
+      - ./data/clickhouse:/var/lib/clickhouse/
+
+  watchdog-redis:
+    container_name: watchdog-redis
+    image: redis:6
+    restart: always
+    ports:
+      - 6379:6379
+    volumes:
+      - ./data/redis:/opt/redis/data
+
+networks:
+  default:
+    external:
+      name: watchdog

@@ -6,7 +6,7 @@
     "emitDecoratorMetadata": true,
     "noImplicitAny": false,
     "esModuleInterop": true,
-    "baseUrl": "./",
+    "baseUrl": "./src",
     "outDir": "./dist",
     "allowJs": true
   },

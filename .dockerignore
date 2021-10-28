@@ -1,0 +1,5 @@
+node_modules
+deploy
+images
+misc
+src/**/node_modules
