@@ -5,7 +5,6 @@ import { AuthModule } from './auth/auth.module'
 import { UsersModule } from './users/users.module'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { User, Spy, Profile } from '@miklebel/watchdog-core'
-import { AuthService } from './auth/auth.service'
 
 @Module({
   imports: [

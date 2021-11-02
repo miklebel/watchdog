@@ -2,7 +2,7 @@ import { Controller, Get, Req, Post, UseGuards, Body, Request } from '@nestjs/co
 import { AppService } from './app.service'
 import { AuthService } from './auth/auth.service'
 import { LocalAuthGuard } from './auth/local.authguard'
-import { CreateUserDto } from './auth/dto/auth.register.dto'
+import { CreateUserDTO } from '@miklebel/watchdog-core'
 import { JwtAuthGuard } from './auth/jwt.authguard'
 
 @Controller()
@@ -21,7 +21,7 @@ export class AppController {
   }
 
   @Post('auth/register')
-  async register(@Body() body: CreateUserDto) {
+  async register(@Body() body: CreateUserDTO) {
     const newUser = this.authService.createUser(body)
     return newUser
   }

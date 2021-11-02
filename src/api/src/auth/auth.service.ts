@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { UsersService } from '../users/users.service'
 import * as bcrypt from 'bcrypt'
-import { User } from '@miklebel/watchdog-core'
-import { CreateUserDto } from './dto/auth.register.dto'
+import { User, CreateUserDTO } from '@miklebel/watchdog-core'
 import { JwtService } from '@nestjs/jwt'
 
 @Injectable()
@@ -27,7 +26,7 @@ export class AuthService {
     }
   }
 
-  async createUser(userDTO: CreateUserDto): Promise<User> {
+  async createUser(userDTO: CreateUserDTO): Promise<User> {
     const { password, role, username } = userDTO
     const hash = await this.generateHash(password)
     return this.usersService.createUser(username, hash, role)
