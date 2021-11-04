@@ -1,14 +1,10 @@
 {
-    "eslint.validate": ["typescript", "javascript", "typescriptreact", "vue"],
-    "eslint.format.enable": true,
-    "eslint.workingDirectories": [
-      "./src/api",
-      "./src/worker",
-    ],
-    "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true
-    },
-    "editor.formatOnSave": true,
-    "typescript.preferences.importModuleSpecifier": "relative",
-  }
-  
+  "eslint.validate": ["typescript", "javascript", "typescriptreact", "vue"],
+  "eslint.format.enable": true,
+  "eslint.workingDirectories": ["./src/api", "./src/worker", "./src/dashboard"],
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "editor.formatOnSave": true,
+  "typescript.preferences.importModuleSpecifier": "relative"
+}

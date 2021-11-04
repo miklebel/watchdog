@@ -1,23 +1,32 @@
-import React, { useState } from "react";
-import logo from "./logo.svg";
-import "./App.css";
-function App() {
+import React from 'react'
+
+import { Switch, Route, BrowserRouter } from 'react-router-dom'
+import Routes from './app/views/Routes'
+import { createTheme, ThemeProvider } from '@mui/material/styles'
+import NavigationBar from './app/components/NavigationBar'
+
+const theme = createTheme({
+  palette: {
+    mode: 'dark'
+  }
+})
+
+const App: React.FC = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        ></a>
-      </header>
-    </div>
-  );
+    <ThemeProvider theme={theme}>
+      <BrowserRouter>
+        <NavigationBar />
+
+        <Switch>
+          {Routes.map((route: any) => (
+            <Route exact path={route.path} key={route.path}>
+              <route.component />
+            </Route>
+          ))}
+        </Switch>
+      </BrowserRouter>
+    </ThemeProvider>
+  )
 }
 
-export default App;
+export default App
