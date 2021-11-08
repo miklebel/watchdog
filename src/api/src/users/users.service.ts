@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { FindOneOptions, Repository } from 'typeorm'
 import { User, UserRole } from '@miklebel/watchdog-core'
 
 @Injectable()
@@ -14,8 +14,8 @@ export class UsersService {
     return this.usersRepository.find()
   }
 
-  findOne(id: string): Promise<User> {
-    return this.usersRepository.findOne(id)
+  findOne(id: string, options?: FindOneOptions<User>): Promise<User> {
+    return this.usersRepository.findOne(id, options)
   }
 
   findByUsername(username: string): Promise<User> {

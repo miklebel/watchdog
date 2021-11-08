@@ -1,13 +1,13 @@
 import * as React from 'react'
 
 import { Pets } from '@mui/icons-material'
-import { Container, Box, Link, TextField, Avatar, Button, Typography } from '@mui/material'
+import { Container, Box, Link, TextField, Avatar, Button, Typography, Divider } from '@mui/material'
 import { authenticateAsync } from '../../redux/auth/token'
 import { useAppDispatch } from '../../redux/hooks'
 
 function Copyright(props: any) {
   return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
+    <Typography variant="body2" color="GrayText" align="center" {...props}>
       {'Copyright © '}
       <Link color="inherit" href="https://github.com/miklebel/">
         miklebel
@@ -35,19 +35,27 @@ export default function SignIn() {
   }
 
   return (
-    <Container>
+    <Container
+      maxWidth="xl"
+      style={{
+        position: 'absolute',
+        top: '50%',
+        msTransform: 'translateY(-50%)',
+        transform: 'translateY(-50%)'
+      }}
+    >
       <Box
         sx={{
-          marginTop: 8,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center'
         }}
       >
-        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-          <Pets />
-        </Avatar>
-        <Typography component="h1" variant="h5">
+        <Typography variant="h2">Watchdog</Typography>
+        <Divider />
+        <Typography variant="caption">Facebook monitoring service.</Typography>
+
+        <Typography style={{ marginTop: 50 }} variant="h5">
           Sign in
         </Typography>
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>

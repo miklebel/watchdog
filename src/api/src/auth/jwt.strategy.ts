@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport'
 import { Injectable } from '@nestjs/common'
 import { jwtConstants } from './constants/secret'
 import { UsersService } from '../users/users.service'
-import { User } from '@miklebel/watchdog-core'
+import { UserDTO } from '@miklebel/watchdog-core'
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -15,7 +15,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     })
   }
 
-  async validate(payload: any): Promise<User> {
-    return this.usersService.findOne(payload.sub)
+  async validate(payload: any): Promise<UserDTO> {
+    return (
+      await this.usersService.findOne(payload.sub, { select: ['role', 'username', 'id'] })
+    ).publicDTO()
   }
 }

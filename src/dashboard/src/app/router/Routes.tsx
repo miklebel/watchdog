@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { Dashboard as DashboardIcon, Settings, Search } from '@mui/icons-material'
+import Spies from '../views/spies/Spies'
 
 const Dashboard: React.FC = () => {
   return <h1>Home</h1>
@@ -8,10 +9,6 @@ const Dashboard: React.FC = () => {
 
 const Standings: React.FC = () => {
   return <h1>Standings</h1>
-}
-
-const Teams: React.FC = () => {
-  return <h1>Teams</h1>
 }
 
 const Routes = [
@@ -31,7 +28,7 @@ const Routes = [
     path: '/spies',
     icon: Search,
     sidebarName: 'Spies',
-    component: Teams
+    component: Spies
   }
 ]
 

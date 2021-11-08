@@ -1,47 +1,70 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import axios from 'axios'
+import { createAsyncThunk, createSlice, createAction } from '@reduxjs/toolkit'
+import axios, { Method, AxiosError } from 'axios'
 import { SERVER_URL } from '../../constants'
 import { AuthenticateUserDTO } from '@miklebel/watchdog-core'
+import { history } from '../../router/History'
+import { RootState, store } from '../store'
 
 export interface TokenState {
-  value: string
+  value: string | null
 }
 
 const initialState: TokenState = {
-  value: ''
+  value: localStorage.getItem('jwtToken')
 }
 
-const getToken = async (username: string, password: string) => {
-  const response = await axios.post(SERVER_URL + 'auth/login', { username, password })
-  return response.data
+export const authRequest = async (method: Method, url: string, state: RootState, data?: any) => {
+  try {
+    const token = state.token.value
+    const response = await axios.request({
+      method,
+      url: SERVER_URL + url,
+      data,
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    return response.data
+  } catch (error) {
+    if (error?.response?.status === 401) {
+      history.push('/login')
+      throw error
+    }
+  }
 }
 
 export const authenticateAsync = createAsyncThunk(
   'token/Authenticate',
   async (payload: AuthenticateUserDTO) => {
     const { password, username } = payload
-    const response = await getToken(username, password)
-
-    return response
+    const response = await axios.post(SERVER_URL + 'auth/login', { username, password }, {})
+    return response.data
   }
 )
+
+export const logout = createAction('token/logout')
 
 export const tokenSlice = createSlice({
   name: 'token',
   initialState,
-  reducers: {
-    logoff: (state: TokenState) => {
-      state.value = ''
-    }
-  },
+  reducers: {},
   extraReducers: builder => {
     builder.addCase(authenticateAsync.fulfilled, (state, action) => {
-      state.value = action.payload.access_token
-      localStorage.setItem('jwtToken', action.payload.access_token)
+      if (action?.payload?.access_token) {
+        state.value = action.payload.access_token
+        localStorage.setItem('jwtToken', action.payload.access_token)
+        setTimeout(() => history.push('/'), 0)
+      }
+    })
+    builder.addCase(authenticateAsync.rejected, (state, action) => {
+      alert('Wrong credentials')
+    })
+    builder.addCase(logout, (state, action) => {
+      state.value = null
+      localStorage.removeItem('jwtToken')
+      history.push('/login')
     })
   }
 })
 
-export const { logoff } = tokenSlice.actions
+// export const {} = tokenSlice.actions
 
 export default tokenSlice.reducer

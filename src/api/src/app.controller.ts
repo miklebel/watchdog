@@ -1,13 +1,18 @@
-import { Controller, Get, Req, Post, UseGuards, Body, Request } from '@nestjs/common'
+import { Controller, Get, Req, Post, UseGuards, Body, Request, Put } from '@nestjs/common'
 import { AppService } from './app.service'
 import { AuthService } from './auth/auth.service'
 import { LocalAuthGuard } from './auth/local.authguard'
-import { CreateUserDTO } from '@miklebel/watchdog-core'
+import { CreateUserDTO, UserDTO, CreateSpyDTO } from '@miklebel/watchdog-core'
 import { JwtAuthGuard } from './auth/jwt.authguard'
+import { SpiesService } from './spies/spies.service'
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService, private readonly authService: AuthService) {}
+  constructor(
+    private readonly appService: AppService,
+    private readonly authService: AuthService,
+    private readonly spiesService: SpiesService
+  ) {}
 
   @Get()
   getHello(): string {
@@ -21,14 +26,26 @@ export class AppController {
   }
 
   @Post('auth/register')
-  async register(@Body() body: CreateUserDTO) {
+  async register(@Body() body: CreateUserDTO): Promise<UserDTO> {
     const newUser = this.authService.createUser(body)
-    return newUser
+    return (await newUser).publicDTO()
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('auth/profile')
-  getProfile(@Request() req) {
+  getProfile(@Request() req: { user: UserDTO }): UserDTO {
     return req.user
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('spy/create')
+  async createSpy(@Body() body: CreateSpyDTO, @Request() req: { user: UserDTO }) {
+    const spy = await this.spiesService.createSpy(body, req.user)
+
+    return spy
+  }
+
+  // @UseGuards(JwtAuthGuard)
+  // @Post('spy/create')
+  // createSpy(@Body() body: )
 }

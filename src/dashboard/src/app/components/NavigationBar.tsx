@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { NavLink, withRouter } from 'react-router-dom'
-import Routes from '../views/Routes'
+import Routes from '../router/Routes'
 
 import { createStyles, makeStyles } from '@mui/styles'
 
@@ -14,13 +14,16 @@ import {
   List,
   ListItem,
   ListItemIcon,
-  Theme,
   ListItemText,
   Button
 } from '@mui/material'
 import { Menu, Logout } from '@mui/icons-material'
+import { connect } from 'react-redux'
+import { AppDispatch, RootState, store } from '../redux/store'
+import { getUserAsync } from '../redux/user/user'
+import { logout } from '../redux/auth/token'
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     root: {
       flexGrow: 1
@@ -43,6 +46,9 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const NavigationBar: React.FC = (props: any) => {
   const classes = useStyles()
+  useEffect(() => {
+    props.dispatch(getUserAsync(props.state))
+  }, [])
   const [isOpen, setIsOpen] = useState(false)
   const toggleDrawer = (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
     if (
@@ -58,6 +64,10 @@ const NavigationBar: React.FC = (props: any) => {
 
   const activeRoute = (routeName: any) => {
     return props.location.pathname === routeName ? true : false
+  }
+
+  const logoutAction = () => {
+    props.dispatch(logout())
   }
 
   return (
@@ -77,8 +87,8 @@ const NavigationBar: React.FC = (props: any) => {
             <Typography variant="h5" className={classes.title}>
               {Routes.find(route => route.path === props.location.pathname)?.sidebarName}
             </Typography>
-
-            <Button color="inherit">
+            {props?.state?.user?.user?.username}
+            <Button onClick={logoutAction} color="inherit">
               <Logout />
             </Button>
           </Toolbar>
@@ -98,7 +108,7 @@ const NavigationBar: React.FC = (props: any) => {
                   <ListItem
                     button
                     key={key}
-                    style={{ color: 'ButtonFace' }}
+                    style={{ color: 'Menu' }}
                     selected={activeRoute(prop.path)}
                   >
                     <ListItemIcon>
@@ -116,4 +126,8 @@ const NavigationBar: React.FC = (props: any) => {
   )
 }
 
-export default withRouter(NavigationBar)
+const mapStateToProps = (state: RootState) => {
+  return { state }
+}
+
+export default connect(mapStateToProps)(withRouter(NavigationBar))
