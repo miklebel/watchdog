@@ -1,9 +1,9 @@
-import { UserDTO } from '@miklebel/watchdog-core'
-import { Dispatch, ThunkDispatch } from '@reduxjs/toolkit'
+import { Container, Paper } from '@mui/material'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import SpiesTable from '../../components/SpiesTable'
+import SpyEditor from '../../components/SpyEditor'
 import { AppDispatch, RootState } from '../../redux/store'
-import { getUserAsync } from '../../redux/user/user'
 
 interface IProps {
   state: RootState
@@ -14,11 +14,14 @@ class Spies extends Component<IProps> {
   constructor(props: IProps) {
     super(props)
   }
-  async componentDidMount() {
-    // await this.props.dispatch(getUserAsync(this.props.state))
-  }
+
   render() {
-    return <div>{JSON.stringify(this.props.state.user.user)}</div>
+    return (
+      <div>
+        <SpiesTable />
+        <SpyEditor />
+      </div>
+    )
   }
 }
 

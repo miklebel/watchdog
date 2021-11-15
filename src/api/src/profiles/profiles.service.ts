@@ -18,7 +18,7 @@ export class ProfilesService {
     return this.profilesRepository.findOne(id, options)
   }
 
-  async createProfiles(usernames: string[]): Promise<Profile[]> {
+  public async createProfiles(usernames: string[]): Promise<Profile[]> {
     const profiles = usernames.map(username => {
       const profile = new Profile()
       profile.username = username

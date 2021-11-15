@@ -1,9 +1,9 @@
 import { createAsyncThunk, createSlice, createAction } from '@reduxjs/toolkit'
-import axios, { Method, AxiosError } from 'axios'
+import axios, { Method } from 'axios'
 import { SERVER_URL } from '../../constants'
 import { AuthenticateUserDTO } from '@miklebel/watchdog-core'
 import { history } from '../../router/History'
-import { RootState, store } from '../store'
+import { RootState } from '../store'
 
 export interface TokenState {
   value: string | null
@@ -54,10 +54,10 @@ export const tokenSlice = createSlice({
         setTimeout(() => history.push('/'), 0)
       }
     })
-    builder.addCase(authenticateAsync.rejected, (state, action) => {
+    builder.addCase(authenticateAsync.rejected, () => {
       alert('Wrong credentials')
     })
-    builder.addCase(logout, (state, action) => {
+    builder.addCase(logout, state => {
       state.value = null
       localStorage.removeItem('jwtToken')
       history.push('/login')

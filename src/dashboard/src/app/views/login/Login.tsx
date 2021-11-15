@@ -1,7 +1,6 @@
 import * as React from 'react'
 
-import { Pets } from '@mui/icons-material'
-import { Container, Box, Link, TextField, Avatar, Button, Typography, Divider } from '@mui/material'
+import { Container, Box, Link, TextField, Button, Typography, Divider } from '@mui/material'
 import { authenticateAsync } from '../../redux/auth/token'
 import { useAppDispatch } from '../../redux/hooks'
 

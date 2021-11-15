@@ -19,7 +19,7 @@ import {
 } from '@mui/material'
 import { Menu, Logout } from '@mui/icons-material'
 import { connect } from 'react-redux'
-import { AppDispatch, RootState, store } from '../redux/store'
+import { RootState } from '../redux/store'
 import { getUserAsync } from '../redux/user/user'
 import { logout } from '../redux/auth/token'
 

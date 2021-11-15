@@ -1,10 +1,7 @@
-import { createAsyncThunk, createSlice, createSelector } from '@reduxjs/toolkit'
-import axios, { Method, AxiosError } from 'axios'
-import { SERVER_URL } from '../../constants'
-import { AuthenticateUserDTO, UserDTO } from '@miklebel/watchdog-core'
-import { history } from '../../router/History'
-import { store, RootState } from '../store'
-import { authRequest, TokenState } from '../auth/token'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { UserDTO } from '@miklebel/watchdog-core'
+import { RootState } from '../store'
+import { authRequest } from '../auth/token'
 
 export interface InitialUserState {
   user: UserDTO | null
@@ -35,9 +32,6 @@ export const userSlice = createSlice({
       if (action?.payload) {
         state.user = action.payload
       }
-    })
-    builder.addCase(getUserAsync.rejected, (state, action) => {
-      return
     })
   }
 })

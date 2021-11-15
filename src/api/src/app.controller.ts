@@ -2,7 +2,14 @@ import { Controller, Get, Req, Post, UseGuards, Body, Request, Put } from '@nest
 import { AppService } from './app.service'
 import { AuthService } from './auth/auth.service'
 import { LocalAuthGuard } from './auth/local.authguard'
-import { CreateUserDTO, UserDTO, CreateSpyDTO } from '@miklebel/watchdog-core'
+import {
+  CreateUserDTO,
+  UserDTO,
+  CreateSpyDTO,
+  SpyListRequestDTO,
+  SpyDTO,
+  SpyListResponseDTO
+} from '@miklebel/watchdog-core'
 import { JwtAuthGuard } from './auth/jwt.authguard'
 import { SpiesService } from './spies/spies.service'
 
@@ -39,13 +46,36 @@ export class AppController {
 
   @UseGuards(JwtAuthGuard)
   @Post('spy/create')
-  async createSpy(@Body() body: CreateSpyDTO, @Request() req: { user: UserDTO }) {
-    const spy = await this.spiesService.createSpy(body, req.user)
+  async createSpy(
+    @Body() body: CreateSpyDTO,
+    @Request() req: { user: UserDTO }
+  ): Promise<CreateSpyDTO> {
+    const spy = await this.spiesService.create(body, req.user)
 
-    return spy
+    const dto = new CreateSpyDTO()
+
+    dto.name = spy.name
+    dto.profileNames = spy.profiles.map(profile => profile.username)
+    dto.scrapingRateMaximum = spy.scrapingRateMaximum
+    dto.scrapingRateMinimum = spy.scrapingRateMinimum
+    dto.status = spy.status
+
+    return dto
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @Post('spy/create')
-  // createSpy(@Body() body: )
+  @UseGuards(JwtAuthGuard)
+  @Post('spy/list')
+  async getSpyList(
+    @Body() body: SpyListRequestDTO,
+    @Request() req: { user: UserDTO }
+  ): Promise<SpyListResponseDTO> {
+    const [spies, count] = await this.spiesService.findByOwner(req.user, body)
+
+    const rows: SpyDTO[] = spies.map(spy => {
+      const { id, name, profiles, scrapingRateMaximum, scrapingRateMinimum, status } = spy
+      const profileNames = profiles.map(profile => profile.username)
+      return { id, name, profileNames, scrapingRateMaximum, scrapingRateMinimum, status }
+    })
+    return { rows, count }
+  }
 }

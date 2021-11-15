@@ -6,12 +6,14 @@ import { UsersModule } from './users/users.module'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { User, Spy, Profile } from '@miklebel/watchdog-core'
 import { SpiesModule } from './spies/spies.module'
+import { ProfilesModule } from './profiles/profiles.module'
 
 @Module({
   imports: [
     AuthModule,
     UsersModule,
     SpiesModule,
+    ProfilesModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
