@@ -19,7 +19,6 @@ class Spies extends Component<IProps> {
     return (
       <div>
         <SpiesTable />
-        <SpyEditor />
       </div>
     )
   }

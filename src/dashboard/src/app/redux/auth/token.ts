@@ -12,7 +12,6 @@ export interface TokenState {
 const initialState: TokenState = {
   value: localStorage.getItem('jwtToken')
 }
-
 export const authRequest = async (method: Method, url: string, state: RootState, data?: any) => {
   try {
     const token = state.token.value
@@ -23,8 +22,8 @@ export const authRequest = async (method: Method, url: string, state: RootState,
       headers: { Authorization: `Bearer ${token}` }
     })
     return response.data
-  } catch (error) {
-    if (error?.response?.status === 401) {
+  } catch (error: any) {
+    if (typeof error === 'object' && error.response.status === 401) {
       history.push('/login')
       throw error
     }

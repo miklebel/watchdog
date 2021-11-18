@@ -5,7 +5,7 @@ import { LocalAuthGuard } from './auth/local.authguard'
 import {
   CreateUserDTO,
   UserDTO,
-  CreateSpyDTO,
+  CreateOrUpdateSpyDTO,
   SpyListRequestDTO,
   SpyDTO,
   SpyListResponseDTO
@@ -45,15 +45,16 @@ export class AppController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('spy/create')
+  @Post('spy/createorupdate')
   async createSpy(
-    @Body() body: CreateSpyDTO,
+    @Body() body: CreateOrUpdateSpyDTO,
     @Request() req: { user: UserDTO }
-  ): Promise<CreateSpyDTO> {
-    const spy = await this.spiesService.create(body, req.user)
+  ): Promise<CreateOrUpdateSpyDTO> {
+    const spy = await this.spiesService.createOrUpdate(body, req.user)
 
-    const dto = new CreateSpyDTO()
+    const dto = new CreateOrUpdateSpyDTO()
 
+    dto.id = spy.id
     dto.name = spy.name
     dto.profileNames = spy.profiles.map(profile => profile.username)
     dto.scrapingRateMaximum = spy.scrapingRateMaximum
@@ -72,9 +73,27 @@ export class AppController {
     const [spies, count] = await this.spiesService.findByOwner(req.user, body)
 
     const rows: SpyDTO[] = spies.map(spy => {
-      const { id, name, profiles, scrapingRateMaximum, scrapingRateMinimum, status } = spy
+      const {
+        id,
+        name,
+        profiles,
+        scrapingRateMaximum,
+        scrapingRateMinimum,
+        status,
+        created,
+        updated
+      } = spy
       const profileNames = profiles.map(profile => profile.username)
-      return { id, name, profileNames, scrapingRateMaximum, scrapingRateMinimum, status }
+      return {
+        id,
+        name,
+        profileNames,
+        scrapingRateMaximum,
+        scrapingRateMinimum,
+        status,
+        created,
+        updated
+      }
     })
     return { rows, count }
   }

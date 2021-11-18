@@ -7,18 +7,20 @@ import {
   Typography,
   Switch,
   FormControlLabel,
-  Grid
+  Grid,
+  IconButton
 } from '@mui/material'
-import { Add } from '@mui/icons-material'
+import { Add, Edit } from '@mui/icons-material'
 import React, { Component, ChangeEvent } from 'react'
 import { connect } from 'react-redux'
 import { AppDispatch, RootState } from '../redux/store'
-import { CreateSpyDTO, SpyStatus } from '@miklebel/watchdog-core'
+import { CreateOrUpdateSpyDTO, SpyDTO, SpyStatus } from '@miklebel/watchdog-core'
 import { createSpyAsync, getSpiesAsync } from '../redux/spies/spies'
 
 interface IProps {
   state: RootState
   dispatch: AppDispatch
+  spy?: SpyDTO
 }
 
 interface Errors {
@@ -33,7 +35,7 @@ interface Errors {
 
 interface IState {
   modal: boolean
-  spy: CreateSpyDTO
+  spy: CreateOrUpdateSpyDTO
   newSpy: boolean
   errors: Errors
 }
@@ -43,13 +45,22 @@ class SpyEditor extends Component<IProps, IState> {
     super(props)
     this.state = {
       modal: false,
-      spy: {
-        name: '',
-        profileNames: [],
-        scrapingRateMaximum: 5,
-        scrapingRateMinimum: 3,
-        status: SpyStatus.ENABLED
-      },
+      spy: this.props.spy
+        ? {
+            id: this.props.spy.id,
+            name: this.props.spy.name,
+            profileNames: this.props.spy.profileNames,
+            scrapingRateMaximum: this.props.spy.scrapingRateMaximum,
+            scrapingRateMinimum: this.props.spy.scrapingRateMinimum,
+            status: this.props.spy.status
+          }
+        : {
+            name: '',
+            profileNames: [],
+            scrapingRateMaximum: 5,
+            scrapingRateMinimum: 3,
+            status: SpyStatus.ENABLED
+          },
       newSpy: true,
       errors: {
         name: { status: false, message: '' },
@@ -162,7 +173,10 @@ class SpyEditor extends Component<IProps, IState> {
     this.validateProfileNames()
     this.validateName()
     if (!this.state.errors.name.status && !this.state.errors.profileNames.status) {
-      await this.props.dispatch(createSpyAsync({ props: this.state.spy, state: this.props.state }))
+      if (this.state.spy.id)
+        await this.props.dispatch(
+          createSpyAsync({ props: this.state.spy, state: this.props.state })
+        )
       this.setInitialState()
       await this.props.dispatch(getSpiesAsync(this.props.state))
     }
@@ -176,9 +190,15 @@ class SpyEditor extends Component<IProps, IState> {
   render() {
     return (
       <div>
-        <Button onClick={this.handleOpen} startIcon={<Add />}>
-          Create a new spy
-        </Button>
+        {this.props.spy ? (
+          <IconButton aria-label="Expand profiles" size="small" onClick={this.handleOpen}>
+            <Edit />
+          </IconButton>
+        ) : (
+          <Button onClick={this.handleOpen} startIcon={<Add />}>
+            Create a new spy
+          </Button>
+        )}
         <Modal
           open={this.state.modal}
           onClose={this.handleClose}
@@ -201,7 +221,7 @@ class SpyEditor extends Component<IProps, IState> {
             }}
           >
             <Typography id="modal-modal-title" variant="h6" component="h2">
-              Create new spy
+              {this.props.spy ? 'Edit spy' : 'Create new spy'}
             </Typography>
             <TextField
               id="standard-basic"

@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import {
-  CreateSpyDTO,
+  CreateOrUpdateSpyDTO,
   SpyDTO,
   SpyListRequestDTO,
   SpyListResponseDTO,
@@ -23,7 +23,7 @@ const initialState: InitialSpiesState = {
   rows: null,
   loading: false,
   count: 0,
-  limit: 15,
+  limit: 10,
   offset: 0,
   order: {
     ascending: true,
@@ -51,13 +51,13 @@ export const getSpiesAsync = createAsyncThunk(
 
 interface CreateSpyProps {
   state: RootState
-  props: CreateSpyDTO
+  props: CreateOrUpdateSpyDTO
 }
 
 export const createSpyAsync = createAsyncThunk(
   'spies/create',
   async (props: CreateSpyProps): Promise<SpyDTO> => {
-    const spyResponse = await authRequest('POST', 'spy/create', props.state, props.props)
+    const spyResponse = await authRequest('POST', 'spy/createorupdate', props.state, props.props)
     return spyResponse
   }
 )
@@ -65,7 +65,22 @@ export const createSpyAsync = createAsyncThunk(
 export const spiesSlice = createSlice({
   name: 'spies',
   initialState,
-  reducers: {},
+  reducers: {
+    sort(state: InitialSpiesState, action) {
+      if (state.order.column === action.payload) {
+        state.order.ascending = !state.order.ascending
+      } else {
+        state.order.column = action.payload
+        state.order.ascending = true
+      }
+    },
+    limit(state: InitialSpiesState, { payload }: { payload: number }) {
+      state.limit = payload
+    },
+    offset(state: InitialSpiesState, { payload }: { payload: number }) {
+      state.offset = payload * state.limit
+    }
+  },
   extraReducers: builder => {
     // builder.addCase(createSpyAsync.fulfilled, async () => {})
     builder.addCase(createSpyAsync.pending, state => {
@@ -84,6 +99,6 @@ export const spiesSlice = createSlice({
   }
 })
 
-export const {} = spiesSlice.actions
+export const { sort, limit, offset } = spiesSlice.actions
 
 export default spiesSlice.reducer

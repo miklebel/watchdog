@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { FindOneOptions, Repository } from 'typeorm'
 import {
-  CreateSpyDTO,
+  CreateOrUpdateSpyDTO,
   Profile,
   Spy,
   SpyDTO,
@@ -50,10 +50,10 @@ export class SpiesService {
     })
   }
 
-  async create(createSpyDTO: CreateSpyDTO, user: UserDTO): Promise<Spy> {
+  async createOrUpdate(createOrUpdateSpyDTO: CreateOrUpdateSpyDTO, user: UserDTO): Promise<Spy> {
     const spy = this.spiesRepository.create()
 
-    const filteredProfileNames = createSpyDTO.profileNames
+    const filteredProfileNames = createOrUpdateSpyDTO.profileNames
       .filter(name => name.length)
       .map(name => name.replace('@', ''))
 
@@ -62,11 +62,12 @@ export class SpiesService {
       this.usersService.findOne(user.id)
     ])
 
-    spy.name = createSpyDTO.name
+    spy.id = createOrUpdateSpyDTO.id
+    spy.name = createOrUpdateSpyDTO.name
     spy.profiles = createdProfiles
-    spy.scrapingRateMaximum = createSpyDTO.scrapingRateMaximum
-    spy.scrapingRateMinimum = createSpyDTO.scrapingRateMinimum
-    spy.status = createSpyDTO.status
+    spy.scrapingRateMaximum = createOrUpdateSpyDTO.scrapingRateMaximum
+    spy.scrapingRateMinimum = createOrUpdateSpyDTO.scrapingRateMinimum
+    spy.status = createOrUpdateSpyDTO.status
     spy.user = foundUser
 
     return this.spiesRepository.save(spy)

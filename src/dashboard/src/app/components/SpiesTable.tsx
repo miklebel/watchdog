@@ -1,15 +1,7 @@
 import {
   Box,
-  Button,
-  Modal,
-  Slider,
-  TextField,
   Typography,
-  Switch,
-  FormControlLabel,
-  Grid,
   Paper,
-  Skeleton,
   TableContainer,
   TableHead,
   Table as MuiTable,
@@ -17,23 +9,24 @@ import {
   TableBody,
   TableCell,
   IconButton,
+  TableSortLabel,
   Collapse,
-  Chip
+  Chip,
+  TablePagination,
+  Skeleton
 } from '@mui/material'
-import { Add, KeyboardArrowUp, KeyboardArrowDown } from '@mui/icons-material'
+import { KeyboardArrowUp, KeyboardArrowDown } from '@mui/icons-material'
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { AppDispatch, RootState } from '../redux/store'
-import { getSpiesAsync } from '../redux/spies/spies'
-import { SpyDTO, SpyStatus } from '@miklebel/watchdog-core'
+import { getSpiesAsync, sort, limit, offset } from '../redux/spies/spies'
+import { SpyDTO, SpyOrderColumn, SpyStatus } from '@miklebel/watchdog-core'
+import moment from 'moment'
+import SpyEditor from './SpyEditor'
 
 interface IProps {
   state: RootState
   dispatch: AppDispatch
-}
-
-interface IState {
-  hello: 'world'
 }
 
 interface ITableProps {
@@ -41,6 +34,7 @@ interface ITableProps {
 }
 interface ITableRowProps {
   row: SpyDTO
+  state: RootState
 }
 
 interface IProfilesTableRowProps {
@@ -58,20 +52,22 @@ class ProfilesTableRow extends Component<IProfilesTableRowProps> {
   }
   render() {
     return (
-      <MuiTableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-          <Collapse in={this.props.opened} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1 }}>
-              <Typography variant="h6" gutterBottom component="div">
-                Profiles
-              </Typography>
-              {this.props.profiles.map(profile => (
-                <Chip style={{ marginRight: 5 }} label={profile} />
-              ))}
-            </Box>
-          </Collapse>
-        </TableCell>
-      </MuiTableRow>
+      <Fragment>
+        <MuiTableRow>
+          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
+            <Collapse in={this.props.opened} timeout="auto" unmountOnExit>
+              <Box sx={{ margin: 1 }}>
+                <Typography variant="h6" gutterBottom component="div">
+                  Profiles
+                </Typography>
+                {this.props.profiles.map(profile => (
+                  <Chip key={profile} style={{ marginRight: 5 }} label={profile} />
+                ))}
+              </Box>
+            </Collapse>
+          </TableCell>
+        </MuiTableRow>
+      </Fragment>
     )
   }
 }
@@ -83,30 +79,64 @@ class TableRow extends Component<ITableRowProps, ITableRowState> {
       opened: false
     }
 
-    this.toggleOpen = this.toggleOpen.bind(this)
+    this.set = this.set.bind(this)
   }
 
-  private toggleOpen() {
-    this.setState({ opened: !this.state.opened })
+  private set(state: boolean) {
+    this.setState({ opened: state })
   }
   render() {
     return (
       <Fragment>
-        <MuiTableRow
-          key={this.props.row.id}
-          sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-        >
+        <MuiTableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
           <TableCell component="th" scope="row">
-            {this.props.row.name}
+            {this.props.state.spies.loading ? <Skeleton variant="text" /> : this.props.row.name}
           </TableCell>
           <TableCell align="right">
-            <IconButton aria-label="Expand profiles" size="small" onClick={this.toggleOpen}>
+            <IconButton
+              aria-label="Expand profiles"
+              size="small"
+              onClick={() => this.set(!this.state.opened)}
+            >
               {this.state.opened ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
             </IconButton>
           </TableCell>
-          <TableCell align="right">{`${this.props.row.scrapingRateMinimum} - ${this.props.row.scrapingRateMaximum}`}</TableCell>
           <TableCell align="right">
-            {this.props.row.status === SpyStatus.ENABLED ? 'Enabled' : 'Disabled'}
+            {this.props.state.spies.loading ? (
+              <Skeleton />
+            ) : (
+              `${this.props.row.scrapingRateMinimum} - ${this.props.row.scrapingRateMaximum}`
+            )}
+          </TableCell>
+          <TableCell align="right">
+            {this.props.state.spies.loading ? (
+              <Skeleton variant="text" />
+            ) : this.props.row.status === SpyStatus.ENABLED ? (
+              'Enabled'
+            ) : (
+              'Disabled'
+            )}
+          </TableCell>
+          <TableCell align="right">
+            {this.props.state.spies.loading ? (
+              <Skeleton variant="text" />
+            ) : (
+              moment(this.props.row.updated).format('MM-DD-YYYY')
+            )}
+          </TableCell>
+          <TableCell align="right">
+            {this.props.state.spies.loading ? (
+              <Skeleton variant="text" />
+            ) : (
+              moment(this.props.row.created).format('MM-DD-YYYY')
+            )}
+          </TableCell>
+          <TableCell align="right">
+            {this.props.state.spies.loading ? (
+              <Skeleton variant="text" />
+            ) : (
+              <SpyEditor spy={this.props.row} />
+            )}
           </TableCell>
         </MuiTableRow>
         <ProfilesTableRow opened={this.state.opened} profiles={this.props.row.profileNames} />
@@ -115,13 +145,14 @@ class TableRow extends Component<ITableRowProps, ITableRowState> {
   }
 }
 
-class SpiesTable extends Component<IProps, IState> {
+class SpiesTable extends Component<IProps> {
   constructor(props: IProps) {
     super(props)
-    console.log('table mounted')
     this.state = {
       hello: 'world'
     }
+    this.setLimit = this.setLimit.bind(this)
+    this.setPage = this.setPage.bind(this)
   }
 
   async componentDidMount() {
@@ -130,28 +161,101 @@ class SpiesTable extends Component<IProps, IState> {
     }
   }
 
-  private Table(props: ITableProps) {
-    return (
-      <TableContainer component={Paper}>
-        <MuiTable sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <MuiTableRow>
-              <TableCell>Spy Name</TableCell>
-              <TableCell align="right">Profiles</TableCell>
-              <TableCell align="right">Rate</TableCell>
-              <TableCell align="right">Status</TableCell>
-            </MuiTableRow>
-          </TableHead>
-          <TableBody>{props.rows ? props.rows.map(row => <TableRow row={row} />) : []}</TableBody>
-        </MuiTable>
-      </TableContainer>
-    )
+  private async toggleSort(column: SpyOrderColumn) {
+    await this.props.dispatch(sort(column))
+    await this.props.dispatch(offset(0))
+    await this.props.dispatch(getSpiesAsync(this.props.state))
+  }
+
+  private sortDirection() {
+    return this.props.state.spies.order.ascending ? 'asc' : 'desc'
+  }
+
+  private async setLimit(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    await this.props.dispatch(offset(0))
+    await this.props.dispatch(limit(+event.target.value))
+    await this.props.dispatch(getSpiesAsync(this.props.state))
+  }
+
+  private async setPage(
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null,
+    page: number
+  ) {
+    await this.props.dispatch(offset(page))
+    await this.props.dispatch(getSpiesAsync(this.props.state))
+  }
+
+  private rows() {
+    return this.props.state.spies.rows
+      ? this.props.state.spies.rows.map(row => (
+          <TableRow key={row.id} state={this.props.state} row={row} />
+        ))
+      : []
   }
 
   render() {
     return (
       <Paper style={{ margin: 10 }}>
-        <this.Table rows={this.props.state.spies.rows} />
+        <TableContainer component={Paper}>
+          <MuiTable sx={{ minWidth: 650 }} aria-label="simple table" size="small">
+            <TableHead>
+              <MuiTableRow>
+                <TableCell>
+                  <TableSortLabel
+                    direction={this.sortDirection()}
+                    active={this.props.state.spies.order.column === SpyOrderColumn.NAME}
+                    onClick={() => this.toggleSort(SpyOrderColumn.NAME)}
+                  >
+                    Spy Name
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell align="right">Profiles</TableCell>
+                <TableCell align="right">Rate</TableCell>
+                <TableCell align="right">
+                  <TableSortLabel
+                    direction={this.sortDirection()}
+                    active={this.props.state.spies.order.column === SpyOrderColumn.STATUS}
+                    onClick={() => this.toggleSort(SpyOrderColumn.STATUS)}
+                  >
+                    Status
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell align="right">
+                  <TableSortLabel
+                    direction={this.sortDirection()}
+                    active={this.props.state.spies.order.column === SpyOrderColumn.UPDATED}
+                    onClick={() => this.toggleSort(SpyOrderColumn.UPDATED)}
+                  >
+                    Updated
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell align="right">
+                  <TableSortLabel
+                    direction={this.sortDirection()}
+                    active={this.props.state.spies.order.column === SpyOrderColumn.CREATED}
+                    onClick={() => this.toggleSort(SpyOrderColumn.CREATED)}
+                  >
+                    Created
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell align="right">Actions</TableCell>
+              </MuiTableRow>
+            </TableHead>
+            <TableBody>{this.rows()}</TableBody>
+          </MuiTable>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <SpyEditor />
+
+            <TablePagination
+              component="div"
+              count={this.props.state.spies.count}
+              page={this.props.state.spies.offset / this.props.state.spies.limit}
+              onPageChange={this.setPage}
+              rowsPerPage={this.props.state.spies.limit}
+              onRowsPerPageChange={this.setLimit}
+            />
+          </Box>
+        </TableContainer>
       </Paper>
     )
   }
