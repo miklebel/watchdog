@@ -65,6 +65,16 @@ export class AppController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Post('spy/delete')
+  async deleteSpy(
+    @Body() body: SpyDTO,
+    @Request() req: { user: UserDTO }
+  ): Promise<CreateOrUpdateSpyDTO> {
+    await this.spiesService.remove(body.id, req.user)
+    return
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post('spy/list')
   async getSpyList(
     @Body() body: SpyListRequestDTO,

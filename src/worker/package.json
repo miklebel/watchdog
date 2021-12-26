@@ -14,6 +14,8 @@
     "ts-check": "tsc -p ./tsconfig.json --noEmit"
   },
   "devDependencies": {
+    "@types/bull": "^3.15.7",
+    "@types/cron": "^1.7.3",
     "@typescript-eslint/eslint-plugin": "^5.1.0",
     "@typescript-eslint/parser": "^5.1.0",
     "eslint": "^8.0.1",
@@ -23,5 +25,16 @@
     "eslint-plugin-prettier": "^4.0.0",
     "prettier": "^2.4.1",
     "typescript": "^4.4.4"
+  },
+  "dependencies": {
+    "@miklebel/watchdog-core": "^0.1.0",
+    "bull": "^4.1.1",
+    "clickhouse": "^2.4.2",
+    "cron": "^1.8.2",
+    "moment": "^2.29.1",
+    "puppeteer": "^13.0.0",
+    "reflect-metadata": "^0.1.13",
+    "tsyringe": "^4.6.0",
+    "typeorm": "^0.2.41"
   }
 }

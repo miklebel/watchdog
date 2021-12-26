@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { FindOneOptions, Repository } from 'typeorm'
+import { DeleteResult, FindOneOptions, Repository } from 'typeorm'
 import {
   CreateOrUpdateSpyDTO,
   Profile,
@@ -73,7 +73,7 @@ export class SpiesService {
     return this.spiesRepository.save(spy)
   }
 
-  async remove(id: string): Promise<void> {
-    await this.spiesRepository.delete(id)
+  async remove(id: number, user: UserDTO): Promise<DeleteResult> {
+    return await this.spiesRepository.delete({ user: { id: user.id }, id })
   }
 }

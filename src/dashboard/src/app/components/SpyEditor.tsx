@@ -21,6 +21,7 @@ interface IProps {
   state: RootState
   dispatch: AppDispatch
   spy?: SpyDTO
+  style?: React.CSSProperties
 }
 
 interface Errors {
@@ -173,10 +174,7 @@ class SpyEditor extends Component<IProps, IState> {
     this.validateProfileNames()
     this.validateName()
     if (!this.state.errors.name.status && !this.state.errors.profileNames.status) {
-      if (this.state.spy.id)
-        await this.props.dispatch(
-          createSpyAsync({ props: this.state.spy, state: this.props.state })
-        )
+      await this.props.dispatch(createSpyAsync({ props: this.state.spy, state: this.props.state }))
       this.setInitialState()
       await this.props.dispatch(getSpiesAsync(this.props.state))
     }
@@ -189,7 +187,7 @@ class SpyEditor extends Component<IProps, IState> {
 
   render() {
     return (
-      <div>
+      <div style={this.props.style}>
         {this.props.spy ? (
           <IconButton aria-label="Expand profiles" size="small" onClick={this.handleOpen}>
             <Edit />

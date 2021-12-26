@@ -54,11 +54,24 @@ interface CreateSpyProps {
   props: CreateOrUpdateSpyDTO
 }
 
+interface DeleteSpyProps {
+  state: RootState
+  props: SpyDTO
+}
+
 export const createSpyAsync = createAsyncThunk(
   'spies/create',
   async (props: CreateSpyProps): Promise<SpyDTO> => {
     const spyResponse = await authRequest('POST', 'spy/createorupdate', props.state, props.props)
     return spyResponse
+  }
+)
+
+export const deleteSpyAsync = createAsyncThunk(
+  'spies/delete',
+  async (props: DeleteSpyProps): Promise<void> => {
+    const res = await authRequest('POST', 'spy/delete', props.state, props.props)
+    console.log(res)
   }
 )
 
@@ -86,11 +99,12 @@ export const spiesSlice = createSlice({
     builder.addCase(createSpyAsync.pending, state => {
       state.loading = true
     })
+    builder.addCase(deleteSpyAsync.pending, state => {
+      state.loading = true
+    })
     builder.addCase(getSpiesAsync.fulfilled, (state, action) => {
       state.rows = action.payload.rows
       state.count = action.payload.count
-
-      console.log({ state })
       state.loading = false
     })
     builder.addCase(getSpiesAsync.pending, state => {

@@ -13,7 +13,9 @@ import {
   Collapse,
   Chip,
   TablePagination,
-  Skeleton
+  Skeleton,
+  Grid,
+  TableFooter
 } from '@mui/material'
 import { KeyboardArrowUp, KeyboardArrowDown } from '@mui/icons-material'
 import React, { Component, Fragment } from 'react'
@@ -23,6 +25,7 @@ import { getSpiesAsync, sort, limit, offset } from '../redux/spies/spies'
 import { SpyDTO, SpyOrderColumn, SpyStatus } from '@miklebel/watchdog-core'
 import moment from 'moment'
 import SpyEditor from './SpyEditor'
+import SpyRemover from './SpyRemover'
 
 interface IProps {
   state: RootState
@@ -131,13 +134,17 @@ class TableRow extends Component<ITableRowProps, ITableRowState> {
               moment(this.props.row.created).format('MM-DD-YYYY')
             )}
           </TableCell>
-          <TableCell align="right">
-            {this.props.state.spies.loading ? (
+
+          {this.props.state.spies.loading ? (
+            <TableCell align="right">
               <Skeleton variant="text" />
-            ) : (
+            </TableCell>
+          ) : (
+            <TableCell align="right" style={{ display: 'flex' }}>
               <SpyEditor spy={this.props.row} />
-            )}
-          </TableCell>
+              <SpyRemover spy={this.props.row} />
+            </TableCell>
+          )}
         </MuiTableRow>
         <ProfilesTableRow opened={this.state.opened} profiles={this.props.row.profileNames} />
       </Fragment>
@@ -197,7 +204,7 @@ class SpiesTable extends Component<IProps> {
     return (
       <Paper style={{ margin: 10 }}>
         <TableContainer component={Paper}>
-          <MuiTable sx={{ minWidth: 650 }} aria-label="simple table" size="small">
+          <MuiTable aria-label="simple table" size="small">
             <TableHead>
               <MuiTableRow>
                 <TableCell>
@@ -242,19 +249,20 @@ class SpiesTable extends Component<IProps> {
               </MuiTableRow>
             </TableHead>
             <TableBody>{this.rows()}</TableBody>
-          </MuiTable>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <SpyEditor />
+            <TableFooter style={{ alignItems: 'center', justifyContent: 'center' }}>
+              <TableCell>
+                <SpyEditor style={{ width: 200, alignSelf: 'center', margin: 'auto 0' }} />
+              </TableCell>
 
-            <TablePagination
-              component="div"
-              count={this.props.state.spies.count}
-              page={this.props.state.spies.offset / this.props.state.spies.limit}
-              onPageChange={this.setPage}
-              rowsPerPage={this.props.state.spies.limit}
-              onRowsPerPageChange={this.setLimit}
-            />
-          </Box>
+              <TablePagination
+                count={this.props.state.spies.count}
+                page={this.props.state.spies.offset / this.props.state.spies.limit}
+                onPageChange={this.setPage}
+                rowsPerPage={this.props.state.spies.limit}
+                onRowsPerPageChange={this.setLimit}
+              />
+            </TableFooter>
+          </MuiTable>
         </TableContainer>
       </Paper>
     )
