@@ -3,10 +3,10 @@
 import Queue from 'bull'
 import moment from 'moment'
 import { container } from 'tsyringe'
+import { ProfilerJobDTO } from '@miklebel/watchdog-core'
 import { ClickhouseTable, TableTweetsColumns } from '../repos/clickhouse/enums'
 import { ClickhouseRepository, ClickhouseRepositorySymbol } from '../repos/clickhouseRepo'
-import { ProfileScraper } from '../scraper'
-import { ProfilerJobDTO } from './dto/profilerJobDTO'
+import { ProfileScraper } from '../scraper/ProfileScraper'
 
 const port = process.env.REDIS_PORT ?? 6379
 const ip = process.env.REDIS_IP ?? 'localhost'
@@ -47,6 +47,7 @@ export const createProfilerQueue = () => {
 
       if (lastTweet?.[0]?.id >= currentTweet.id || yesterday.diff(moment(time)) > 0) {
         console.log('end')
+        await scraper.close()
         break
       } else {
         clickhouseRepository.insert({

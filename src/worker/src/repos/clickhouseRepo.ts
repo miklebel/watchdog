@@ -1,6 +1,7 @@
 /* eslint-disable class-methods-use-this */
 import { ClickHouse } from 'clickhouse'
-import { ClickhouseTable, TableTweetsColumns } from './clickhouse/enums'
+import { TweetDTO, TweetJobDTO } from '@miklebel/watchdog-core'
+import { ClickhouseTable, TableTweetsColumns, TableTweetsStatsColumns } from './clickhouse/enums'
 import {
   ClickHouseInsertInterface,
   ClickhouseOrderInterface,
@@ -32,17 +33,25 @@ export class ClickhouseRepository {
     return new ClickhouseRepository(clickhouse)
   }
 
-  public select(selectOptions: ClickhouseQueryInterface) {
+  public select(selectOptions: ClickhouseQueryInterface): Promise<TweetDTO[]> {
     console.log(this.selectSql(selectOptions))
-    return this.clickhouse.query(this.selectSql(selectOptions)).toPromise()
+    return this.clickhouse
+      .query(this.selectSql(selectOptions))
+      .toPromise() as Promise<unknown> as Promise<TweetDTO[]>
   }
 
   public insert(insertOptions: ClickHouseInsertInterface) {
     return this.clickhouse.insert(this.insertSql(insertOptions)).toPromise()
   }
 
-  private columnsSql(columns: TableTweetsColumns[]) {
-    return `SELECT ${columns.join(', ')}`
+  private columnsSql(columns: TableTweetsColumns[] | TableTweetsStatsColumns[]) {
+    return `SELECT ${columns
+      .map(column =>
+        column === TableTweetsColumns.id || column === TableTweetsStatsColumns.id
+          ? `toString(${column}) as ${column}`
+          : column
+      )
+      .join(', ')}`
   }
 
   private fromSql(table: ClickhouseTable) {
@@ -55,7 +64,7 @@ export class ClickhouseRepository {
         ...prev,
         `${column} IN (${values
           .map(value => (typeof value === 'string' ? `'${value.toLowerCase()}'` : value))
-          .join(',')})`
+          .join(', ')})`
       ]
     }, [])
 
@@ -111,7 +120,20 @@ export class ClickhouseRepository {
             return `${value}`
           case TableTweetsColumns.username:
             return `'${value.toString().toLowerCase()}'`
-
+          case TableTweetsStatsColumns.date:
+            return `toDate(${value})`
+          case TableTweetsStatsColumns.time:
+            return `toDateTime(${value})`
+          case TableTweetsStatsColumns.id:
+            return `${value}`
+          case TableTweetsStatsColumns.username:
+            return `'${value.toString().toLowerCase()}'`
+          case TableTweetsStatsColumns.likes:
+            return `${value}`
+          case TableTweetsStatsColumns.quotes:
+            return `${value}`
+          case TableTweetsStatsColumns.retweets:
+            return `${value}`
           default:
             throw new Error('Non-existent key in insert function')
         }
@@ -119,5 +141,30 @@ export class ClickhouseRepository {
       .join(', ')
 
     return `INSERT INTO watchdog.${insert.table}_buffer (${columnsSql}) values (${valuesSql})`
+  }
+
+  public async selectTweetScraper() {
+    const sql = `SELECT toString(id) as id, username from (SELECT id, username
+    FROM 
+    (
+        SELECT
+            id,
+            count() AS count
+        FROM watchdog.tweets_stats_buffer
+        GROUP BY id
+    ) AS tweets_stats
+    RIGHT JOIN 
+    (
+        SELECT
+            username,
+            id,
+            date,
+            time
+        FROM watchdog.tweets_buffer
+    ) AS tweets USING (id)
+    WHERE ((dateDiff('hour', time, now()) >= 24) AND (count = 0))
+       OR ((dateDiff('hour', time, now()) >= (24 * 3)) AND (count = 1)) 
+       OR ((dateDiff('hour', time, now()) >= (24 * 7)) AND (count = 2)))`
+    return this.clickhouse.query(sql).toPromise() as Promise<unknown> as Promise<TweetJobDTO[]>
   }
 }

@@ -1,14 +1,14 @@
 /* eslint-disable no-restricted-syntax */
 import { CronJob } from 'cron'
 import { container } from 'tsyringe'
+import { ProfilerJobDTO } from '@miklebel/watchdog-core'
 import { TypeOrmRepository, TypeOrmRepositorySymbol } from '../repos/typeormRepo'
 import { profilerQueue } from '../queues/profiler'
-import { ProfilerJobDTO } from '../queues/dto/profilerJobDTO'
 
 export const createProfilerScheduler = (): CronJob => {
   const repository = container.resolve<TypeOrmRepository>(TypeOrmRepositorySymbol)
   const job = new CronJob(
-    '0 0-23 * * *',
+    '30,0 * * * *',
     async () => {
       console.log('new job processing')
       const profiles = await repository.getActiveProfiles()

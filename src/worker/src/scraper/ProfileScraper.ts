@@ -2,7 +2,6 @@
 /* eslint-disable no-return-assign */
 /* eslint-disable no-use-before-define */
 import puppeteer from 'puppeteer'
-import moment from 'moment'
 import { ProfileDTO } from '@miklebel/watchdog-core'
 
 export class ProfileScraper {
@@ -91,7 +90,7 @@ export class ProfileScraper {
     await this.wait()
   }
 
-  private close() {
+  public close() {
     return this.browser.close()
   }
 }
