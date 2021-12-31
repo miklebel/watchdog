@@ -38,13 +38,16 @@ export class TweetScraper {
       const result = {
         retweets: +Array.from(document.querySelectorAll('a'))
           .find(a => a.href.endsWith(`status/${id}/retweets`))
-          ?.querySelector('span').innerText,
+          ?.querySelector('span')
+          .innerText.replace(' ', ''),
         quotes: +Array.from(document.querySelectorAll('a'))
           .find(a => a.href.endsWith(`status/${id}/retweets/with_comments`))
-          ?.querySelector('span').innerText,
+          ?.querySelector('span')
+          .innerText.replace(' ', ''),
         likes: +Array.from(document.querySelectorAll('a'), tag => tag)
           .find(a => a.href.endsWith(`status/${id}/likes`))
-          ?.querySelector('span').innerText
+          ?.querySelector('span')
+          .innerText.replace(' ', '')
       }
       return result
     }, this.tweet.id)
