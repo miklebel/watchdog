@@ -165,6 +165,6 @@ export class ClickhouseRepository {
     WHERE ((dateDiff('hour', time, now()) >= 24) AND (count = 0))
        OR ((dateDiff('hour', time, now()) >= (24 * 3)) AND (count = 1)) 
        OR ((dateDiff('hour', time, now()) >= (24 * 7)) AND (count = 2)))`
-    return this.clickhouse.query(sql).toPromise() as Promise<unknown> as Promise<TweetJobDTO[]>
+    return this.clickhouse.query(sql).toPromise() as Promise<TweetJobDTO[]>
   }
 }

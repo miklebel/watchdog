@@ -1,7 +1,6 @@
 /* eslint-disable class-methods-use-this */
 import { Connection, createConnection, Repository } from 'typeorm'
 import { Profile, ProfileDTO, Spy, SpyDTO, SpyStatus, User } from '@miklebel/watchdog-core'
-import { inject } from 'tsyringe'
 
 export const TypeOrmRepositorySymbol = Symbol('TypeOrmRepositorySymbol')
 
@@ -47,13 +46,16 @@ export class TypeOrmRepository {
     return activeSpies
   }
 
-  public async getActiveProfiles(): Promise<Profile[]> {
-    const activeProfiles = await this.profilesRepository
-      .createQueryBuilder('profile')
-      .innerJoinAndSelect('profile.spies', 'spy', 'spy.status = :status', {
-        status: SpyStatus.ENABLED
-      })
-      .getMany()
+  public async getActiveProfiles(profiles?: string[]): Promise<Profile[]> {
+    const query = this.profilesRepository.createQueryBuilder('profile')
+
+    if (profiles && profiles.length) {
+      query.where(`profile.username ~* '${profiles.join('|')}'`)
+    }
+    query.innerJoinAndSelect('profile.spies', 'spy', 'spy.status = :status', {
+      status: SpyStatus.ENABLED
+    })
+    const activeProfiles = await query.getMany()
     return activeProfiles
   }
 
