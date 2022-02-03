@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { FindOneOptions, Repository } from 'typeorm'
-import { Profile } from '@miklebel/watchdog-core'
+import { FindOneOptions, Repository, FindManyOptions } from 'typeorm'
+import { Profile, Spy, UserDTO } from '@miklebel/watchdog-core'
 
 @Injectable()
 export class ProfilesService {
   constructor(
     @InjectRepository(Profile)
-    private profilesRepository: Repository<Profile>
+    private profilesRepository: Repository<Profile> // @InjectRepository(Spy) // private spiesRepository: Repository<Spy>
   ) {}
 
   findAll(): Promise<Profile[]> {
@@ -26,5 +26,33 @@ export class ProfilesService {
     })
 
     return this.profilesRepository.save(profiles)
+  }
+
+  public async findProfiles(
+    user: UserDTO,
+    where?: { username?: string; spyId?: string },
+    options?: FindManyOptions<Profile>
+  ) {
+    const query = this.profilesRepository.createQueryBuilder('profile')
+    if (where?.username)
+      query.where('profile.username ILIKE :username', { username: `%${where.username}%` })
+    query.innerJoinAndSelect(
+      'profile.spies',
+      'spy',
+      `spy.user.id = :userId ${where?.spyId ? `AND spy.id = :spyId` : ''}`,
+      {
+        userId: user.id,
+        spyId: where?.spyId
+      }
+    )
+
+    query.orderBy('profile.username', 'ASC')
+
+    query.limit(options?.take ?? 10)
+    if (options?.skip) query.skip(options.skip)
+
+    const [count, rows] = await Promise.all([query.getCount(), query.getMany()])
+
+    return { count, rows }
   }
 }

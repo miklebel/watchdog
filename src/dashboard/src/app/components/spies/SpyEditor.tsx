@@ -13,9 +13,9 @@ import {
 import { Add, Edit } from '@mui/icons-material'
 import React, { Component, ChangeEvent } from 'react'
 import { connect } from 'react-redux'
-import { AppDispatch, RootState } from '../redux/store'
+import { AppDispatch, RootState } from '../../redux/store'
 import { CreateOrUpdateSpyDTO, SpyDTO, SpyStatus } from '@miklebel/watchdog-core'
-import { createSpyAsync, getSpiesAsync } from '../redux/spies/spies'
+import { createSpyAsync, getSpiesAsync } from '../../redux/spies/spies'
 
 interface IProps {
   state: RootState

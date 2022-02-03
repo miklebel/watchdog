@@ -1,9 +1,15 @@
 /* eslint-disable no-restricted-syntax */
 import { CronJob } from 'cron'
 import { container } from 'tsyringe'
+import Queue from 'bull'
 import { ClickhouseRepository, ClickhouseRepositorySymbol } from '@miklebel/watchdog-core'
-import { tweetQueue } from '../queues/tweet'
+
 import { TypeOrmRepository, TypeOrmRepositorySymbol } from '../repos/typeormRepo'
+
+const port = process.env.REDIS_PORT ?? 6379
+const ip = process.env.REDIS_IP ?? 'localhost'
+
+const tweetQueue = new Queue('tweet', `redis://${ip}:${port}`)
 
 export const createTweetScheduler = (): CronJob => {
   const clickhouseRepository = container.resolve<ClickhouseRepository>(ClickhouseRepositorySymbol)

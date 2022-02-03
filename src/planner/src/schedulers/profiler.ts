@@ -1,9 +1,13 @@
 /* eslint-disable no-restricted-syntax */
 import { CronJob } from 'cron'
 import { container } from 'tsyringe'
+import Queue from 'bull'
 import { ProfilerJobDTO } from '@miklebel/watchdog-core'
 import { TypeOrmRepository, TypeOrmRepositorySymbol } from '../repos/typeormRepo'
-import { profilerQueue } from '../queues/profiler'
+const port = process.env.REDIS_PORT ?? 6379
+const ip = process.env.REDIS_IP ?? 'localhost'
+
+const profilerQueue = new Queue('profiler', `redis://${ip}:${port}`)
 
 export const createProfilerScheduler = (): CronJob => {
   const repository = container.resolve<TypeOrmRepository>(TypeOrmRepositorySymbol)

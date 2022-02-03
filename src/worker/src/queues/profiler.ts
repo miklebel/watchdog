@@ -3,9 +3,14 @@
 import Queue from 'bull'
 import moment from 'moment'
 import { container } from 'tsyringe'
-import { ProfilerJobDTO } from '@miklebel/watchdog-core'
-import { ClickhouseTable, TableTweetsColumns } from '../repos/clickhouse/enums'
-import { ClickhouseRepository, ClickhouseRepositorySymbol } from '../repos/clickhouseRepo'
+import {
+  ProfilerJobDTO,
+  ClickhouseTable,
+  TableTweetsColumns,
+  ClickhouseRepository,
+  ClickhouseRepositorySymbol
+} from '@miklebel/watchdog-core'
+
 import { ProfileScraper } from '../scraper/ProfileScraper'
 
 const port = process.env.REDIS_PORT ?? 6379

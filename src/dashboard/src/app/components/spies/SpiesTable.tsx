@@ -14,14 +14,13 @@ import {
   Chip,
   TablePagination,
   Skeleton,
-  Grid,
   TableFooter
 } from '@mui/material'
 import { KeyboardArrowUp, KeyboardArrowDown } from '@mui/icons-material'
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
-import { AppDispatch, RootState } from '../redux/store'
-import { getSpiesAsync, sort, limit, offset } from '../redux/spies/spies'
+import { AppDispatch, RootState } from '../../redux/store'
+import { getSpiesAsync, sort, limit, offset } from '../../redux/spies/spies'
 import { SpyDTO, SpyOrderColumn, SpyStatus } from '@miklebel/watchdog-core'
 import moment from 'moment'
 import SpyEditor from './SpyEditor'
@@ -32,9 +31,6 @@ interface IProps {
   dispatch: AppDispatch
 }
 
-interface ITableProps {
-  rows: SpyDTO[] | null
-}
 interface ITableRowProps {
   row: SpyDTO
   state: RootState
@@ -202,7 +198,7 @@ class SpiesTable extends Component<IProps> {
 
   render() {
     return (
-      <Paper style={{ margin: 10 }}>
+      <Paper style={{ paddingTop: '10px' }}>
         <TableContainer component={Paper}>
           <MuiTable aria-label="simple table" size="small">
             <TableHead>

@@ -1,8 +1,10 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-return-assign */
 /* eslint-disable no-use-before-define */
+import pupExtra from 'puppeteer-extra'
 import puppeteer from 'puppeteer'
 import { TweetJobDTO } from '@miklebel/watchdog-core'
+import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 
 export class TweetScraper {
   private browser: puppeteer.Browser
@@ -17,11 +19,18 @@ export class TweetScraper {
   }
 
   public static async init(tweet: TweetJobDTO) {
-    const browser = await puppeteer.launch({ headless: false })
+    pupExtra.use(StealthPlugin())
+    const browser = await pupExtra.launch({ headless: true })
     const tweetScraper = new TweetScraper(browser, tweet)
-    await tweetScraper.newPage()
-    await tweetScraper.goto(`https://twitter.com/${tweet.username}/status/${tweet.id}`)
-    return tweetScraper
+
+    try {
+      await tweetScraper.newPage()
+      await tweetScraper.goto(`https://twitter.com/${tweet.username}/status/${tweet.id}`)
+      return tweetScraper
+    } catch (err) {
+      await tweetScraper.close()
+      throw err
+    }
   }
 
   private async newPage() {
@@ -39,15 +48,15 @@ export class TweetScraper {
         retweets: +Array.from(document.querySelectorAll('a'))
           .find(a => a.href.endsWith(`status/${id}/retweets`))
           ?.querySelector('span')
-          .innerText.replace(' ', ''),
+          .innerText.replace(/[^0-9]/g, ''),
         quotes: +Array.from(document.querySelectorAll('a'))
           .find(a => a.href.endsWith(`status/${id}/retweets/with_comments`))
           ?.querySelector('span')
-          .innerText.replace(' ', ''),
+          .innerText.replace(/[^0-9]/g, ''),
         likes: +Array.from(document.querySelectorAll('a'), tag => tag)
           .find(a => a.href.endsWith(`status/${id}/likes`))
           ?.querySelector('span')
-          .innerText.replace(' ', '')
+          .innerText.replace(/[^0-9]/g, '')
       }
       return result
     }, this.tweet.id)

@@ -1,8 +1,7 @@
-import { Container, Paper } from '@mui/material'
+import { Container } from '@mui/material'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import SpiesTable from '../../components/SpiesTable'
-import SpyEditor from '../../components/SpyEditor'
+import SpiesTable from '../../components/spies/SpiesTable'
 import { AppDispatch, RootState } from '../../redux/store'
 
 interface IProps {
@@ -17,9 +16,9 @@ class Spies extends Component<IProps> {
 
   render() {
     return (
-      <div>
+      <Container maxWidth="lg">
         <SpiesTable />
-      </div>
+      </Container>
     )
   }
 }

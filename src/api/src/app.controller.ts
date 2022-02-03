@@ -1,5 +1,4 @@
 import { Controller, Get, Req, Post, UseGuards, Body, Request, Put } from '@nestjs/common'
-import { AppService } from './app.service'
 import { AuthService } from './auth/auth.service'
 import { LocalAuthGuard } from './auth/local.authguard'
 import {
@@ -8,22 +7,26 @@ import {
   CreateOrUpdateSpyDTO,
   SpyListRequestDTO,
   SpyDTO,
-  SpyListResponseDTO
+  SpyListResponseDTO,
+  ClickhouseRepository,
+  ClickhouseTable,
+  TableTweetsStatsColumns,
+  GetTweetsStatsListDTO
 } from '@miklebel/watchdog-core'
 import { JwtAuthGuard } from './auth/jwt.authguard'
 import { SpiesService } from './spies/spies.service'
+import { ProfilesService } from './profiles/profiles.service'
 
 @Controller()
 export class AppController {
+  private clickhouseRepo: ClickhouseRepository
+
   constructor(
-    private readonly appService: AppService,
+    private readonly profilesService: ProfilesService,
     private readonly authService: AuthService,
     private readonly spiesService: SpiesService
-  ) {}
-
-  @Get()
-  getHello(): string {
-    return this.appService.getHello()
+  ) {
+    this.clickhouseRepo = ClickhouseRepository.init({})
   }
 
   @UseGuards(LocalAuthGuard)
@@ -106,5 +109,28 @@ export class AppController {
       }
     })
     return { rows, count }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('profiles')
+  async getProfilesList(@Request() req: { user: UserDTO }): Promise<any> {
+    const profiles = await this.profilesService.findProfiles(req.user)
+    return profiles
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('feed/tweetsStats')
+  async getTweetsList(
+    @Request() req: { user: UserDTO },
+    @Body() body: GetTweetsStatsListDTO
+  ): Promise<any> {
+    const { username, date, limit, offset } = body
+    const tweets = await this.clickhouseRepo.selectStatsByUsername({
+      username,
+      date,
+      limit,
+      offset
+    })
+    return tweets
   }
 }

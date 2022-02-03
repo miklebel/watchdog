@@ -1,13 +1,5 @@
 import {
-  Box,
   Button,
-  Modal,
-  Slider,
-  TextField,
-  Typography,
-  Switch,
-  FormControlLabel,
-  Grid,
   IconButton,
   Dialog,
   DialogTitle,
@@ -15,12 +7,12 @@ import {
   DialogActions,
   DialogContent
 } from '@mui/material'
-import { Add, Edit, Delete } from '@mui/icons-material'
-import React, { Component, ChangeEvent } from 'react'
+import { Delete } from '@mui/icons-material'
+import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { AppDispatch, RootState } from '../redux/store'
-import { CreateOrUpdateSpyDTO, SpyDTO, SpyStatus } from '@miklebel/watchdog-core'
-import { createSpyAsync, deleteSpyAsync, getSpiesAsync } from '../redux/spies/spies'
+import { AppDispatch, RootState } from '../../redux/store'
+import { SpyDTO } from '@miklebel/watchdog-core'
+import { deleteSpyAsync, getSpiesAsync } from '../../redux/spies/spies'
 
 interface IProps {
   state: RootState

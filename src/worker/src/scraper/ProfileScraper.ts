@@ -2,7 +2,9 @@
 /* eslint-disable no-return-assign */
 /* eslint-disable no-use-before-define */
 import puppeteer from 'puppeteer'
+import pupExtra from 'puppeteer-extra'
 import { ProfileDTO } from '@miklebel/watchdog-core'
+import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 
 export class ProfileScraper {
   private browser: puppeteer.Browser
@@ -17,7 +19,8 @@ export class ProfileScraper {
   }
 
   public static async init(profile: ProfileDTO) {
-    const browser = await puppeteer.launch({ headless: false })
+    pupExtra.use(StealthPlugin())
+    const browser = await pupExtra.launch({ headless: true })
     const profileScraper = new ProfileScraper(browser, profile)
     await profileScraper.newPage()
     await profileScraper.goto(`https://twitter.com/${profile.username}`)
