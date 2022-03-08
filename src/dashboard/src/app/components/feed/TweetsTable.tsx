@@ -7,6 +7,7 @@ import HighchartsReact from 'highcharts-react-official'
 import moment from 'moment'
 import { Box, Grid, Paper, TablePagination } from '@mui/material'
 import { getTweetsStatsListAsync, limit, offset } from '../../redux/feed/feed'
+import { showError } from '../../redux/alerts/alerts'
 
 interface IProps {
   state: RootState
@@ -79,13 +80,15 @@ export class TweetsTable extends Component<IProps> {
   }
 
   private async setPage(event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) {
-    await this.props.dispatch(offset(newPage))
-    await this.props.dispatch(getTweetsStatsListAsync(this.props.state))
+    this.props.dispatch(offset(newPage))
+
+    this.props.dispatch(getTweetsStatsListAsync(this.props.state))
   }
 
   private async setLimit(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     await this.props.dispatch(limit(+event.target.value))
     await this.props.dispatch(offset(0))
+
     await this.props.dispatch(getTweetsStatsListAsync(this.props.state))
   }
 

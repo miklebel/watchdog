@@ -1,7 +1,7 @@
 import { Container } from '@mui/material'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import SpiesTable from '../../components/spies/SpiesTable'
+import FollowerProfilersTable from '../../components/followerProfilers/FollowerProfilerTable'
 import { AppDispatch, RootState } from '../../redux/store'
 
 interface IProps {
@@ -9,7 +9,7 @@ interface IProps {
   dispatch: AppDispatch
 }
 
-class Spies extends Component<IProps> {
+class FollowerProfilers extends Component<IProps> {
   constructor(props: IProps) {
     super(props)
   }
@@ -17,7 +17,7 @@ class Spies extends Component<IProps> {
   render() {
     return (
       <Container maxWidth="lg" style={{ marginTop: '20px' }}>
-        <SpiesTable />
+        <FollowerProfilersTable />
       </Container>
     )
   }
@@ -27,4 +27,4 @@ const mapStateToProps = (state: RootState) => {
   return { state }
 }
 
-export default connect(mapStateToProps)(Spies)
+export default connect(mapStateToProps)(FollowerProfilers)

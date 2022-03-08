@@ -4,9 +4,11 @@ import { AppService } from './app.service'
 import { AuthModule } from './auth/auth.module'
 import { UsersModule } from './users/users.module'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { User, Spy, Profile } from '@miklebel/watchdog-core'
+import { User, Spy, Profile, FollowerProfiler, Account } from '@miklebel/watchdog-core'
 import { SpiesModule } from './spies/spies.module'
 import { ProfilesModule } from './profiles/profiles.module'
+import { FollowerProfilersModule } from './followerProfilers/followerProfilers.module'
+import { AccountsModule } from './accounts/accounts.module'
 
 @Module({
   imports: [
@@ -14,6 +16,8 @@ import { ProfilesModule } from './profiles/profiles.module'
     UsersModule,
     SpiesModule,
     ProfilesModule,
+    FollowerProfilersModule,
+    AccountsModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
@@ -21,7 +25,7 @@ import { ProfilesModule } from './profiles/profiles.module'
       username: process.env.POSTGRES_USERNAME || 'watchdog',
       password: process.env.POSTGRES_PASSWORD || 'watchdog',
       database: process.env.POSTGRES_DATABASE || 'watchdog',
-      entities: [User, Spy, Profile],
+      entities: [User, Spy, Profile, FollowerProfiler, Account],
       synchronize: process.env.NODE_ENV === 'production' ? false : true,
       logging: false,
       migrationsTableName: 'migrations'

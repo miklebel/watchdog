@@ -36,7 +36,7 @@ const useStyles = makeStyles(() =>
       paddingLeft: 20
     },
     drawer: {
-      width: 200
+      width: 300
     },
     fullList: {
       width: 'auto'

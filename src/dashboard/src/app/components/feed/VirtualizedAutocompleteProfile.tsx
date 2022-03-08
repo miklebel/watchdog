@@ -9,6 +9,7 @@ import {
   offset,
   setProfile
 } from '../../redux/feed/feed'
+import { showError } from '../../redux/alerts/alerts'
 
 // export default function ComboBox() {
 //   return (
@@ -46,6 +47,7 @@ export class VirtualizedAutocompleteProfile extends Component<IProps, IState> {
 
   async componentDidMount() {
     await this.props.dispatch(getAllSpiesAsync(this.props.state))
+
     this.setState({
       ...this.state,
       selectedOption:
@@ -76,6 +78,7 @@ export class VirtualizedAutocompleteProfile extends Component<IProps, IState> {
       await this.props.dispatch(setProfile(option.label))
       this.setState({ ...this.state, selectedOption: option })
       await this.props.dispatch(offset(0))
+
       await this.props.dispatch(getTweetsStatsListAsync(this.props.state))
     }
   }

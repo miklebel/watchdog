@@ -44,7 +44,7 @@ const initialState: InitialFeedState = {
 }
 
 export const getAllSpiesAsync = createAsyncThunk(
-  'spies/get',
+  'tweetsStats/get/spies',
   async (state: RootState): Promise<SpyListResponseDTO> => {
     const data: SpyListRequestDTO = {
       limit: 1000,

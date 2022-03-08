@@ -15,18 +15,21 @@ const initialState: TokenState = {
 export const authRequest = async (method: Method, url: string, state: RootState, data?: any) => {
   try {
     const token = state.token.value
+
     const response = await axios.request({
       method,
       url: SERVER_URL + url,
       data,
       headers: { Authorization: `Bearer ${token}` }
     })
+
     return response.data
   } catch (error: any) {
     if (typeof error === 'object' && error.response.status === 401) {
       history.push('/login')
       throw error
     }
+    throw error
   }
 }
 
@@ -52,9 +55,6 @@ export const tokenSlice = createSlice({
         localStorage.setItem('jwtToken', action.payload.access_token)
         setTimeout(() => history.push('/'), 0)
       }
-    })
-    builder.addCase(authenticateAsync.rejected, () => {
-      alert('Wrong credentials')
     })
     builder.addCase(logout, state => {
       state.value = null

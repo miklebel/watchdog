@@ -4,6 +4,7 @@ import { container } from 'tsyringe'
 import Queue from 'bull'
 import { ProfilerJobDTO } from '@miklebel/watchdog-core'
 import { TypeOrmRepository, TypeOrmRepositorySymbol } from '../repos/typeormRepo'
+
 const port = process.env.REDIS_PORT ?? 6379
 const ip = process.env.REDIS_IP ?? 'localhost'
 
@@ -17,7 +18,9 @@ export const createProfilerScheduler = (): CronJob => {
     async () => {
       console.log('new job processing')
       const profiles = await repository.getActiveProfiles()
-      for (const profile of profiles) {
+      const followerProfilerProfiles = await repository.getActiveFollowerProfilersProfiles()
+
+      for (const profile of [...profiles, ...followerProfilerProfiles]) {
         const profileDTO = repository.profileToDTO(profile)
         const jobData: ProfilerJobDTO = { profile: profileDTO }
         profilerQueue.add(jobData)
