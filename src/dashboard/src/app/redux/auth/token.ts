@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, createAction } from '@reduxjs/toolkit'
 import axios, { Method } from 'axios'
-import { SERVER_URL } from '../../constants'
+import { API_URL } from '../../constants'
 import { AuthenticateUserDTO } from '@miklebel/watchdog-core'
 import { history } from '../../router/History'
 import { RootState } from '../store'
@@ -18,7 +18,7 @@ export const authRequest = async (method: Method, url: string, state: RootState,
 
     const response = await axios.request({
       method,
-      url: SERVER_URL + url,
+      url: API_URL + url,
       data,
       headers: { Authorization: `Bearer ${token}` }
     })
@@ -37,7 +37,7 @@ export const authenticateAsync = createAsyncThunk(
   'token/Authenticate',
   async (payload: AuthenticateUserDTO) => {
     const { password, username } = payload
-    const response = await axios.post(SERVER_URL + 'auth/login', { username, password }, {})
+    const response = await axios.post(API_URL + 'auth/login', { username, password }, {})
     return response.data
   }
 )

@@ -7,8 +7,8 @@ import NavigationBar from './app/components/NavigationBar'
 import SignIn from './app/views/login/Login'
 import { Alert, CssBaseline, Snackbar } from '@mui/material'
 import { history } from './app/router/History'
-import { connect, Provider } from 'react-redux'
-import { AppDispatch, RootState, store } from './app/redux/store'
+import { connect } from 'react-redux'
+import { AppDispatch, RootState } from './app/redux/store'
 
 import { hideError, hideSuccess } from './app/redux/alerts/alerts'
 

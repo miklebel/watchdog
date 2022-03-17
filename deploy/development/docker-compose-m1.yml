@@ -6,50 +6,41 @@ services:
     image: postgres:12.2
     restart: always
     ports:
-      - 5432:5432
+      - 127.0.0.1:5432:5432
     environment:
       POSTGRES_USER: "watchdog"
       POSTGRES_PASSWORD: "watchdog"
       POSTGRES_DB: "watchdog"
     volumes:
       - ./postgresql/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ./data/postgresql:/var/lib/postgresql/data
+      - ./data/postgresql2:/var/lib/postgresql/data
+    networks:
+      - "watchdog"
 
   watchdog-clickhouse:
     container_name: watchdog-clickhouse
     image: altinity/clickhouse-server:21.6.1.6734-testing-arm
     restart: always
     ports:
-      - 8123:8123
-      - 9000:9000
+      - 127.0.0.1:8123:8123
+      - 127.0.0.1:9000:9000
     volumes:
       - ./clickhouse/config.xml:/etc/clickhouse-server/config.xml
       - ./data/clickhouse:/var/lib/clickhouse/
+    networks:
+      - "watchdog"
 
   watchdog-redis:
     container_name: watchdog-redis
     image: redis:6
     restart: always
     ports:
-      - 6379:6379
+      - 127.0.0.1:6379:6379
     volumes:
       - ./data/redis:/opt/redis/data
-
-  watchdog-traefik:
-    # The official v2 Traefik docker image
-    image: traefik:latest
-    # Enables the web UI and tells Traefik to listen to docker
-    command: --api.insecure=true --providers.docker
-    ports:
-      # The HTTP port
-      - "80:80"
-      # The Web UI (enabled by --api.insecure=true)
-      - "8080:8080"
-    volumes:
-      - ./data/traefik:/etc/traefik/
-      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - "watchdog"
 
 networks:
-  default:
-    external:
-      name: watchdog
+  watchdog:
+    external: true

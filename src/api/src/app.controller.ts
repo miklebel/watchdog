@@ -1,6 +1,6 @@
 import { Controller, Get, Req, Post, UseGuards, Body, Request, Put } from '@nestjs/common'
-import { AuthService } from './auth/auth.service'
-import { LocalAuthGuard } from './auth/local.authguard'
+import { AuthService } from './services/auth/auth.service'
+import { LocalAuthGuard } from './services/auth/local.authguard'
 import {
   CreateUserDTO,
   UserDTO,
@@ -19,11 +19,11 @@ import {
   AccountDTO,
   CreateOrUpdateAccountDTO
 } from '@miklebel/watchdog-core'
-import { JwtAuthGuard } from './auth/jwt.authguard'
-import { SpiesService } from './spies/spies.service'
-import { ProfilesService } from './profiles/profiles.service'
-import { FollowerProfilerService } from './followerProfilers/followerProfilers.service'
-import { AccountsService } from './accounts/accounts.service'
+import { JwtAuthGuard } from './services/auth/jwt.authguard'
+import { SpiesService } from './services/spies/spies.service'
+import { ProfilesService } from './services/profiles/profiles.service'
+import { FollowerProfilerService } from './services/followerProfilers/followerProfilers.service'
+import { AccountsService } from './services/accounts/accounts.service'
 
 @Controller()
 export class AppController {
@@ -40,25 +40,26 @@ export class AppController {
   }
 
   @UseGuards(LocalAuthGuard)
-  @Post('auth/login')
+  @Post('api/auth/login')
   async login(@Req() req) {
     return this.authService.login(req.user)
   }
 
-  @Post('auth/register')
+  @Post('api/auth/register')
   async register(@Body() body: CreateUserDTO): Promise<UserDTO> {
     const newUser = this.authService.createUser(body)
     return (await newUser).publicDTO()
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('auth/profile')
+  @Get('api/auth/profile')
   getProfile(@Request() req: { user: UserDTO }): UserDTO {
+    console.log(req.user)
     return req.user
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('spy/createorupdate')
+  @Post('api/spy/createorupdate')
   async createSpy(
     @Body() body: CreateOrUpdateSpyDTO,
     @Request() req: { user: UserDTO }
@@ -78,7 +79,7 @@ export class AppController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('spy/delete')
+  @Post('api/spy/delete')
   async deleteSpy(
     @Body() body: SpyDTO,
     @Request() req: { user: UserDTO }
@@ -88,7 +89,7 @@ export class AppController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('spy/list')
+  @Post('api/spy/list')
   async getSpyList(
     @Body() body: SpyListRequestDTO,
     @Request() req: { user: UserDTO }
@@ -122,14 +123,14 @@ export class AppController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('profiles')
+  @Get('api/profiles')
   async getProfilesList(@Request() req: { user: UserDTO }): Promise<any> {
     const profiles = await this.profilesService.findProfiles(req.user)
     return profiles
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('feed/tweetsStats')
+  @Post('api/feed/tweetsStats')
   async getTweetsList(
     @Request() req: { user: UserDTO },
     @Body() body: GetTweetsStatsListDTO
@@ -145,7 +146,7 @@ export class AppController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('followerProfiler/list')
+  @Post('api/followerProfiler/list')
   async getFollowerProfilerList(
     @Body() body: FollowerProfilerListRequestDTO,
     @Request() req: { user: UserDTO }
@@ -171,7 +172,7 @@ export class AppController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('followerProfiler/createorupdate')
+  @Post('api/followerProfiler/createorupdate')
   async createFollowerProfiler(
     @Body() body: CreateOrUpdateFollowerProfilerDTO,
     @Request() req: { user: UserDTO }
@@ -189,7 +190,7 @@ export class AppController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('followerProfiler/delete')
+  @Post('api/followerProfiler/delete')
   async deleteFollowerProfiler(
     @Body() body: FollowerProfilerDTO,
     @Request() req: { user: UserDTO }
@@ -199,7 +200,7 @@ export class AppController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('account/list')
+  @Post('api/account/list')
   async getAccountList(
     @Body() body: AccountListRequestDTO,
     @Request() req: { user: UserDTO }
@@ -220,7 +221,7 @@ export class AppController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('account/createorupdate')
+  @Post('api/account/createorupdate')
   async createAccount(
     @Body() body: CreateOrUpdateAccountDTO,
     @Request() req: { user: UserDTO }
@@ -238,7 +239,7 @@ export class AppController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('account/delete')
+  @Post('api/account/delete')
   async deleteAccount(
     @Body() body: AccountDTO,
     @Request() req: { user: UserDTO }
