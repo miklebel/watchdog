@@ -75,7 +75,7 @@ export const createFollowerProfilerAsync = createAsyncThunk(
 export const deleteFollowerProfilerAsync = createAsyncThunk(
   'followerProfilers/delete',
   async (props: DeleteFollowerProfilerProps): Promise<void> => {
-    const res = await authRequest('POST', 'followerProfiler/delete', props.state, props.props)
+    await authRequest('POST', 'followerProfiler/delete', props.state, props.props)
   }
 )
 

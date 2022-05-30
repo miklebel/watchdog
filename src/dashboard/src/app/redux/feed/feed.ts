@@ -1,3 +1,4 @@
+/* eslint-disable no-throw-literal */
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import {
   GetTweetsStatsListDTO,

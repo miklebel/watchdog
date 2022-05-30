@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-useless-constructor */
 import React, { Component } from 'react'
 import TextField from '@mui/material/TextField'
 import { LocalizationProvider, DatePicker as MuiDatePicker } from '@mui/lab'

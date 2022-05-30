@@ -7,7 +7,6 @@ import HighchartsReact from 'highcharts-react-official'
 import moment from 'moment'
 import { Box, Grid, Paper, TablePagination } from '@mui/material'
 import { getTweetsStatsListAsync, limit, offset } from '../../redux/feed/feed'
-import { showError } from '../../redux/alerts/alerts'
 
 interface IProps {
   state: RootState

@@ -70,7 +70,7 @@ export const createSpyAsync = createAsyncThunk(
 export const deleteSpyAsync = createAsyncThunk(
   'spies/delete',
   async (props: DeleteSpyProps): Promise<void> => {
-    const res = await authRequest('POST', 'spy/delete', props.state, props.props)
+    await authRequest('POST', 'spy/delete', props.state, props.props)
   }
 )
 

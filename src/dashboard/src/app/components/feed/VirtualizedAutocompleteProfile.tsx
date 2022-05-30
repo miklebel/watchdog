@@ -9,7 +9,6 @@ import {
   offset,
   setProfile
 } from '../../redux/feed/feed'
-import { showError } from '../../redux/alerts/alerts'
 
 // export default function ComboBox() {
 //   return (

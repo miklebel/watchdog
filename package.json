@@ -6,7 +6,8 @@
   "scripts": {
     "api": "yarn workspace api start",
     "worker": "yarn workspace worker start",
-    "dashboard": "yarn workspace dashboard start"
+    "dashboard": "yarn workspace dashboard start",
+    "planner": "yarn workspace planner start"
   },
   "workspaces": {
     "packages": [

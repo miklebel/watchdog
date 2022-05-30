@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-useless-constructor */
 import { Container } from '@mui/material'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'

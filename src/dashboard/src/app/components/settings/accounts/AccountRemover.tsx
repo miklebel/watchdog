@@ -5,9 +5,7 @@ import {
   DialogTitle,
   DialogContentText,
   DialogActions,
-  DialogContent,
-  Snackbar,
-  Alert
+  DialogContent
 } from '@mui/material'
 import { Delete } from '@mui/icons-material'
 import React, { Component } from 'react'
@@ -15,7 +13,6 @@ import { connect } from 'react-redux'
 import { AppDispatch, RootState } from '../../../redux/store'
 import { AccountDTO } from '@miklebel/watchdog-core'
 import { deleteAccountAsync, getAccountsAsync } from '../../../redux/accounts/accounts'
-import { showSuccess, showError } from '../../../redux/alerts/alerts'
 
 interface IProps {
   state: RootState

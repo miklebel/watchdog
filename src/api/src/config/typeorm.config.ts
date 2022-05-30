@@ -14,8 +14,8 @@ export const createConfig = (): TypeOrmModuleOptions => {
     logging: false,
     migrationsTableName: 'migrations',
     cli: {
-      migrationsDir: 'src/typeorm/migrations'
+      migrationsDir: `${__dirname}/../typeorm/migrations`
     },
-    migrations: ['src/typeorm/migrations/*.ts']
+    migrations: [`${__dirname}/../src/typeorm/migrations/*.ts`]
   }
 }
